@@ -142,21 +142,7 @@ local Button = MainTab:CreateButton({
      end
  })
  
- local Slider = MainTab:CreateSlider({
-    Name = "WalkSpeed",
-    Range = {16, 300},
-    Increment = 1,
-    Suffix = "Speed",
-    CurrentValue = 16,
-    Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-    end,
-})
-
--- Your toggle creation code
--- Your toggle creation code
-local Toggle = MainTab:CreateToggle({
+ local Toggle = MainTab:CreateToggle({
     Name = "Aim Bot",
     CurrentValue = false,
     Flag = "ToggleAimBot", -- Unique flag for this toggle
@@ -204,3 +190,36 @@ local Toggle = MainTab:CreateToggle({
     end,
 })
 
+
+ local Slider = MainTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 300},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+    end,
+})
+
+local Slider = MainTab:CreateSlider({
+    Name = "Jump Power",
+    Range = {50, 200}, -- Adjust the range as needed
+    Increment = 10,
+    Suffix = "Power",
+    CurrentValue = 50,
+    Flag = "SliderJumpPower", -- Unique flag for this slider
+    Callback = function(Value)
+        -- The function that takes place when the slider changes
+        -- The variable (Value) is a number which correlates to the value the slider is currently at
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+    end,
+})
+
+
+
+-- Your toggle creation code
+-- Your toggle creation code
+
+-- Jump Power slider creation code
