@@ -34,8 +34,17 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
+Rayfield:Notify({
+    Title = "Script Squad",
+    Content = "Thanks for using us!",
+    Duration = 6.5,
+    Image = "rewind",
+ })
+
 local MainTab = Window:CreateTab("Visuals", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Main")
+
+
 
 local Button = MainTab:CreateButton({
     Name = "Button Example",
