@@ -47,7 +47,7 @@ local MainSection = MainTab:CreateSection("Main")
 
 
 local Button = MainTab:CreateButton({
-    Name = "Button Example",
+    Name = "Inf Jump",
     Callback = function()
        -- The function that runs when the button is pressed
        _G.infinjump = not _G.infinjump
@@ -75,4 +75,66 @@ local Button = MainTab:CreateButton({
        end
     end -- This properly closes the function
  }) -- This properly closes the CreateButton function
+ 
+ local espEnabled = false
+ local espParts = {} -- Stores ESP parts for cleanup
+ 
+ local function createESP(target)
+     if not target:FindFirstChild("ESPBox") then
+         local box = Instance.new("BoxHandleAdornment")
+         box.Name = "ESPBox"
+         box.Adornee = target
+         box.Size = Vector3.new(4, 6, 4) -- Adjusted to fit humanoids
+         box.Color3 = Color3.fromRGB(0, 255, 0)
+         box.AlwaysOnTop = true
+         box.ZIndex = 10
+         box.Transparency = 0.5
+         box.Parent = target -- Properly attached
+ 
+         espParts[target] = box -- Store for removal
+     end
+ end
+ 
+ local function removeAllESP()
+     for _, esp in pairs(espParts) do
+         if esp then
+             esp:Destroy()
+         end
+     end
+     espParts = {} -- Clear stored ESP parts
+ end
+ 
+ local function toggleESP()
+     if espEnabled then
+         removeAllESP()
+         espEnabled = false
+         print("ESP Disabled")
+     else
+         for _, player in pairs(game.Players:GetPlayers()) do
+             if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                 createESP(player.Character.HumanoidRootPart)
+             end
+         end
+ 
+         game.Players.PlayerAdded:Connect(function(player)
+             player.CharacterAdded:Connect(function(character)
+                 local root = character:WaitForChild("HumanoidRootPart")
+                 if espEnabled then
+                     createESP(root)
+                 end
+             end)
+         end)
+ 
+         espEnabled = true
+         print("ESP Enabled")
+     end
+ end
+ 
+ -- Create the ESP Toggle Button
+ local Button = MainTab:CreateButton({
+     Name = "Toggle ESP",
+     Callback = function()
+         toggleESP()
+     end
+ }) -- Properly closed function
  
