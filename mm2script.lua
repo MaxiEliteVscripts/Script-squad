@@ -104,12 +104,9 @@ local Button = MainTab:CreateButton({
      espParts = {} -- Clear stored ESP parts
  end
  
- local function toggleESP()
-     if espEnabled then
-         removeAllESP()
-         espEnabled = false
-         print("ESP Disabled")
-     else
+ local function toggleESP(Value)
+     if Value then
+         -- Enable ESP
          for _, player in pairs(game.Players:GetPlayers()) do
              if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                  createESP(player.Character.HumanoidRootPart)
@@ -127,14 +124,83 @@ local Button = MainTab:CreateButton({
  
          espEnabled = true
          print("ESP Enabled")
+     else
+         -- Disable ESP
+         removeAllESP()
+         espEnabled = false
+         print("ESP Disabled")
      end
  end
  
- -- Create the ESP Toggle Button
- local Button = MainTab:CreateButton({
+ -- Create the ESP Toggle using the Toggle button style
+ local Toggle = MainTab:CreateToggle({
      Name = "Toggle ESP",
-     Callback = function()
-         toggleESP()
+     CurrentValue = false, -- Default to disabled
+     Flag = "ESP_Toggle", -- Unique flag identifier for the configuration
+     Callback = function(Value)
+         toggleESP(Value) -- Pass the toggle value to the function
      end
- }) -- Properly closed function
+ })
  
+ local Slider = MainTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 300},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+    end,
+})
+
+-- Your toggle creation code
+-- Your toggle creation code
+local Toggle = MainTab:CreateToggle({
+    Name = "Aim Bot",
+    CurrentValue = false,
+    Flag = "ToggleAimBot", -- Unique flag for this toggle
+    Callback = function(Value)
+        -- Aim Bot script
+        aimBotEnabled = Value
+
+        local function aimAt(target)
+            if target and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                local cam = game.Workspace.CurrentCamera
+                local targetPos = target.Position
+                cam.CFrame = CFrame.new(cam.CFrame.Position, targetPos)
+            end
+        end
+
+        local function findTarget()
+            local nearestPlayer = nil
+            local shortestDistance = math.huge
+
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+                    if distance < shortestDistance then
+                        shortestDistance = distance
+                        nearestPlayer = player
+                    end
+                end
+            end
+            return nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("HumanoidRootPart") or nil
+        end
+
+        local function aimBotLoop()
+            while aimBotEnabled do
+                local target = findTarget()
+                aimAt(target)
+                wait(0.1) -- Adjust this value to control the aim bot's speed
+            end
+        end
+
+        if aimBotEnabled then
+            -- Start the aim bot
+            spawn(aimBotLoop)
+        end
+    end,
+})
+
