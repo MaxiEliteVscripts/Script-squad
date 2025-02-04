@@ -76,6 +76,43 @@ local Button = MainTab:CreateButton({
     end -- This properly closes the function
  }) -- This properly closes the CreateButton function
  
+-- Noclip toggle creation code
+local Toggle = Tab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "ToggleNoclip", -- Unique flag for this toggle
+    Callback = function(Value)
+        -- The function that takes place when the toggle is pressed
+        -- The variable (Value) is a boolean on whether the toggle is true or false
+
+        if Value then
+            -- Enable Noclip
+            noclip = game:GetService("RunService").Stepped:Connect(function()
+                if game.Players.LocalPlayer.Character then
+                    for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") and part.CanCollide then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            -- Disable Noclip
+            if noclip then
+                noclip:Disconnect()
+            end
+            if game.Players.LocalPlayer.Character then
+                for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end
+    end,
+})
+
+
  local espEnabled = false
  local espParts = {} -- Stores ESP parts for cleanup
  
