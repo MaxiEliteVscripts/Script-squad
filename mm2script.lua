@@ -41,12 +41,19 @@ Rayfield:Notify({
     Image = "rewind",
  })
 
-local MainTab = Window:CreateTab("Visuals", nil) -- Title, Image
-local MainSection = MainTab:CreateSection("Main")
+local VisualsTab = Window:CreateTab("Visuals", nil) -- Title, Image
+local VisualsSection = VisualsTab:CreateSection("Main")
+
+local CombatTab = Window:CreateTab("Combat", nil) -- Title, Image
+local CombatSection = CombatTab:CreateSection("Combat")
+
+local MovementTab = Window:CreateTab("Movement", nil) -- Title, Image
+local MovementSection = MovementTab:CreateSection("Movement")
 
 
 
-local Button = MainTab:CreateButton({
+
+local Button = MovementTab:CreateButton({
     Name = "Inf Jump",
     Callback = function()
        -- The function that runs when the button is pressed
@@ -134,7 +141,7 @@ local Button = MainTab:CreateButton({
  end
  
  -- Create the ESP Toggle using the Toggle button style
- local Toggle = MainTab:CreateToggle({
+ local Toggle = VisualsTab:CreateToggle({
      Name = "Toggle ESP",
      CurrentValue = false, -- Default to disabled
      Flag = "ESP_Toggle", -- Unique flag identifier for the configuration
@@ -143,7 +150,7 @@ local Button = MainTab:CreateButton({
      end
  })
  
- local Toggle = MainTab:CreateToggle({
+ local Toggle = CombatTab:CreateToggle({
     Name = "Aim Bot",
     CurrentValue = false,
     Flag = "ToggleAimBot", -- Unique flag for this toggle
@@ -192,7 +199,7 @@ local Button = MainTab:CreateButton({
 })
 
 
- local Slider = MainTab:CreateSlider({
+ local Slider = MovementTab:CreateSlider({
     Name = "WalkSpeed",
     Range = {16, 300},
     Increment = 1,
@@ -204,7 +211,7 @@ local Button = MainTab:CreateButton({
     end,
 })
 
-local Slider = MainTab:CreateSlider({
+local Slider = MovementTab:CreateSlider({
     Name = "Jump Power",
     Range = {50, 200}, -- Adjust the range as needed
     Increment = 10,
@@ -217,6 +224,83 @@ local Slider = MainTab:CreateSlider({
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
     end,
 })
+
+local RunService = game:GetService("RunService") -- Used to update No Clip continuously
+local NoClipEnabled = false
+
+local Toggle = MovementTab:CreateToggle({
+    Name = "No Clip",
+    Flag = "ToggleNoClip",
+    CurrentValue = false,
+    Callback = function(State)
+        NoClipEnabled = State
+    end,
+})
+
+RunService.Stepped:Connect(function()
+    if NoClipEnabled then
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+local mainRemotes = game.ReplicatedStorage
+local meleeRemote = mainRemotes["meleeEvent"]
+local mouse = game.Players.LocalPlayer:GetMouse()
+local punchingEnabled = false -- Toggle state
+local cooldown = false
+
+-- Create Toggle for Rayfield UI
+local Toggle = CombatTab:CreateToggle({
+    Name = "OnePunch",
+    Flag = "ToggleMelee",
+    CurrentValue = false,
+    Callback = function(state)
+        punchingEnabled = state
+    end,
+})
+
+-- Function to execute punch
+local function punch()
+    if not punchingEnabled or cooldown then return end
+    cooldown = true
+
+    local character = game.Players.LocalPlayer.Character
+    local part = Instance.new("Part", character)
+    part.Transparency = 1
+    part.Size = Vector3.new(5, 2, 3)
+    part.CanCollide = false
+
+    local weld = Instance.new("Weld", part)
+    weld.Part0 = character.Torso
+    weld.Part1 = part
+    weld.C1 = CFrame.new(0, 0, 2)
+
+    part.Touched:Connect(function(hit)
+        local plr = game.Players:FindFirstChild(hit.Parent.Name)
+        if plr and plr.Name ~= game.Players.LocalPlayer.Name then
+            part:Destroy()
+            for i = 1, 100 do
+                meleeRemote:FireServer(plr)
+            end
+        end
+    end)
+
+    wait(1) -- Cooldown time
+    cooldown = false
+    part:Destroy()
+end
+
+-- Detect key press (F) to punch
+mouse.KeyDown:Connect(function(key)
+    if key:lower() == "f" then
+        punch()
+    end
+end)
+
 
 
 
