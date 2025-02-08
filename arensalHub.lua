@@ -1,12 +1,26 @@
 
 local gameID = game.GameId
+local NameGame = nil
 
 if gameID == 286090429 then
+    NameGame = "🎮Arensal ScriptHub🔫"
+else
+    NameGame = "🎮Unknow ScriptHub🔫"
+end
+
+if GameId == 14202073004 then
+    NameGame = "🎮Unnamed-Shooter ScriptHub🔫"
+end
+
+if gameID == 155615604 then 
+    NameGame = "🎮Prison-Life ScriptHub🔫"
+end
+
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "🎮Arensal ScriptHub🔫",
+   Name = NameGame,
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Script Squad Hub",
    LoadingSubtitle = "by IDK",
@@ -163,7 +177,7 @@ local Button = MovementTab:CreateButton({
      Flag = "ToggleAimBot", -- Unique flag for this toggle
      Callback = function(Value)
          aimBotEnabled = Value
- 
+         
          local function aimAt(target)
              if target and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                  local cam = game.Workspace.CurrentCamera
@@ -209,7 +223,8 @@ local Button = MovementTab:CreateButton({
      HoldToInteract = false,
      Flag = "AimBotKeybind", -- Unique flag
      Callback = function()
-         Toggle:SetValue(not aimBotEnabled) -- Toggle Aim Bot on key press
+         aimBotEnabled = not aimBotEnabled
+         Toggle.Callback(aimBotEnabled) -- Manually trigger the toggle's callback
      end,
  })
  
