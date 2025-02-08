@@ -13,7 +13,7 @@ if GameId == 14202073004 then
 end
 
 if gameID == 155615604 then 
-    NameGame = "🎮Prison-Life ScriptHub🔫"
+    NameGame = "🎮Unnamed-Shooter ScriptHub🔫"
 end
 
 
